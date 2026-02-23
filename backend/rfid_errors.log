@@ -1,0 +1,50 @@
+[28-Nov-2025 03:56:40 Asia/Manila] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry '0' for key 'PRIMARY' in C:\xampp\htdocs\SAM_system\backend\rfid_process.php:168
+Stack trace:
+#0 C:\xampp\htdocs\SAM_system\backend\rfid_process.php(168): mysqli_stmt->execute()
+#1 {main}
+  thrown in C:\xampp\htdocs\SAM_system\backend\rfid_process.php on line 168
+[28-Nov-2025 03:57:03 Asia/Manila] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry '0' for key 'PRIMARY' in C:\xampp\htdocs\SAM_system\backend\rfid_process.php:168
+Stack trace:
+#0 C:\xampp\htdocs\SAM_system\backend\rfid_process.php(168): mysqli_stmt->execute()
+#1 {main}
+  thrown in C:\xampp\htdocs\SAM_system\backend\rfid_process.php on line 168
+[28-Nov-2025 03:57:06 Asia/Manila] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry '0' for key 'PRIMARY' in C:\xampp\htdocs\SAM_system\backend\rfid_process.php:168
+Stack trace:
+#0 C:\xampp\htdocs\SAM_system\backend\rfid_process.php(168): mysqli_stmt->execute()
+#1 {main}
+  thrown in C:\xampp\htdocs\SAM_system\backend\rfid_process.php on line 168
+[28-Nov-2025 04:12:52 Asia/Manila] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry '0' for key 'PRIMARY' in C:\xampp\htdocs\SAM_system\backend\rfid_process.php:177
+Stack trace:
+#0 C:\xampp\htdocs\SAM_system\backend\rfid_process.php(177): mysqli_stmt->execute()
+#1 {main}
+  thrown in C:\xampp\htdocs\SAM_system\backend\rfid_process.php on line 177
+[28-Nov-2025 04:13:07 Asia/Manila] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry '0' for key 'PRIMARY' in C:\xampp\htdocs\SAM_system\backend\rfid_process.php:177
+Stack trace:
+#0 C:\xampp\htdocs\SAM_system\backend\rfid_process.php(177): mysqli_stmt->execute()
+#1 {main}
+  thrown in C:\xampp\htdocs\SAM_system\backend\rfid_process.php on line 177
+[28-Nov-2025 04:13:15 Asia/Manila] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry '0' for key 'PRIMARY' in C:\xampp\htdocs\SAM_system\backend\rfid_process.php:177
+Stack trace:
+#0 C:\xampp\htdocs\SAM_system\backend\rfid_process.php(177): mysqli_stmt->execute()
+#1 {main}
+  thrown in C:\xampp\htdocs\SAM_system\backend\rfid_process.php on line 177
+[28-Nov-2025 04:16:02 Asia/Manila] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry '0' for key 'PRIMARY' in C:\xampp\htdocs\SAM_system\backend\rfid_process.php:177
+Stack trace:
+#0 C:\xampp\htdocs\SAM_system\backend\rfid_process.php(177): mysqli_stmt->execute()
+#1 {main}
+  thrown in C:\xampp\htdocs\SAM_system\backend\rfid_process.php on line 177
+[28-Nov-2025 04:16:06 Asia/Manila] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry '0' for key 'PRIMARY' in C:\xampp\htdocs\SAM_system\backend\rfid_process.php:177
+Stack trace:
+#0 C:\xampp\htdocs\SAM_system\backend\rfid_process.php(177): mysqli_stmt->execute()
+#1 {main}
+  thrown in C:\xampp\htdocs\SAM_system\backend\rfid_process.php on line 177
+[28-Nov-2025 04:16:12 Asia/Manila] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry '0' for key 'PRIMARY' in C:\xampp\htdocs\SAM_system\backend\rfid_process.php:177
+Stack trace:
+#0 C:\xampp\htdocs\SAM_system\backend\rfid_process.php(177): mysqli_stmt->execute()
+#1 {main}
+  thrown in C:\xampp\htdocs\SAM_system\backend\rfid_process.php on line 177
+[28-Nov-2025 04:16:44 Asia/Manila] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry '0' for key 'PRIMARY' in C:\xampp\htdocs\SAM_system\backend\rfid_process.php:177
+Stack trace:
+#0 C:\xampp\htdocs\SAM_system\backend\rfid_process.php(177): mysqli_stmt->execute()
+#1 {main}
+  thrown in C:\xampp\htdocs\SAM_system\backend\rfid_process.php on line 177
