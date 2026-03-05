@@ -3,8 +3,8 @@ session_start();
 require_once 'config.php';
 
 // ========== LOGIN ATTEMPT CONSTANTS ==========
-define('MAX_LOGIN_ATTEMPTS', 3);
-define('LOCKOUT_DURATION', 180); // 3 minutes in seconds
+define('MAX_LOGIN_ATTEMPTS', 5);
+define('LOCKOUT_DURATION', 90); // 3 minutes in seconds
 
 // Password validation function
 function validatePassword($password) {
