@@ -186,7 +186,7 @@ if (isset($_POST['login'])) {
                 if ($_SESSION['role'] === 'admin') {
                     header("Location: ../Admin_dashboard.php");
                 } elseif ($_SESSION['role'] === 'teacher') {
-                    header("Location: ../dashboard_teacher.php");
+                    header("Location: ../Dashboard_teacher.php");
                 } else {
                     header("Location: ../dashboard_student.php");
                 }
