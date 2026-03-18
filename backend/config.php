@@ -1,15 +1,12 @@
 <?php
+$host = "sql308.infinityfree.com";
+$user = "if0_41314799";
+$pass = "your_actual_password";
+$db   = "if0_41314799_db_sam";
 
-$host = "localhost";
-$user = "root";
-$password = "";
-$database = "sam_system";
+$conn = mysqli_connect($host, $user, $pass, $db);
 
-$conn = new mysqli($host, $user, $password, $database);
-
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
 }
-
 ?>
