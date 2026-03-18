@@ -270,6 +270,29 @@ body { font-family: var(--font-body); background: var(--bg); color: var(--text);
 .stat-value { font-family: var(--font-head); font-size: 28px; font-weight: 800; }
 .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
 .table-wrap { overflow-x: auto; }
+
+/* Mobile Responsiveness */
+@media(max-width:1024px){.stats-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){
+  .sidebar{width:100%;height:65px;min-height:auto;flex-direction:row;justify-content:space-around;padding:0;top:auto;bottom:0;border-right:none;border-top:1px solid var(--border);position:fixed;z-index:999;}
+  .sidebar-logo,.sidebar-label,.sidebar-bottom{display:none;}
+  .nav-item{flex-direction:column;padding:8px 0;gap:4px;flex:1;justify-content:center;border-left:none;border-top:3px solid transparent;font-size:11px;}
+  .nav-item:hover{background:transparent;}
+  .nav-item.active{border-left-color:transparent;border-top-color:var(--accent);background:rgba(0,178,255,.07);}
+  .nav-item .icon{margin:0;}
+  .main{margin-left:0;margin-bottom:65px;}
+  .topbar{padding:0 16px;height:56px;}
+  .topbar-title{font-size:13px;}
+  .content{padding:16px;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:480px){
+  .topbar-title{display:none;}
+  .data-table th,.data-table td{padding:8px;font-size:12px;}
+  .stats-row{gap:10px;}
+  .card-head h2{font-size:13px;}
+  .stat-value{font-size:22px;}
+}
 </style>
 </head>
 <body>

@@ -384,13 +384,18 @@ $lockout_seconds = ($lockout_until > time()) ? ($lockout_until - time()) : 0;
         .password-requirements li.invalid { color: var(--danger); }
         .password-requirements li i { font-size: 10px; width: 12px; }
 
+        .mobile-toggle { display: none; }
+
         /* ── Responsive ── */
         @media (max-width: 768px) {
-            .login-container { min-height: 100vh; border-radius: 0; flex-direction: column; }
-            .form-box { position: static; width: 100%; opacity: 0; visibility: hidden; min-height: 100vh; }
-            .form-box.active { opacity: 1; visibility: visible; }
+            .login-container { min-height: 100vh; border-radius: 0; flex-direction: column; align-items: flex-start; }
+            .form-box { position: absolute; width: 100%; height: 100vh; padding: 40px 24px; opacity: 0; visibility: hidden; }
+            .form-box.active { position: relative; opacity: 1; visibility: visible; z-index: 5; }
             .overlay-container { display: none; }
             .form-box h2 { font-size: 24px; }
+            .mobile-toggle { display: block; margin-top: 24px; text-align: center; font-size: 13px; color: var(--muted); }
+            .mobile-toggle a { color: var(--accent); font-weight: 600; text-decoration: none; }
+            .mobile-toggle a:hover { color: var(--accent2); }
         }
     </style>
 </head>
@@ -432,6 +437,7 @@ $lockout_seconds = ($lockout_until > time()) ? ($lockout_until - time()) : 0;
                 <a href="forgotpassword.php" class="forgot-password">Forgot your password?</a>
                 <button type="submit" name="login" id="login-submit-btn"
                         <?= $lockout_seconds > 0 ? 'disabled' : '' ?>>Sign In</button>
+                <div class="mobile-toggle">Don't have an account? <a href="#" onclick="showForm('register-form'); return false;">Sign Up</a></div>
             </form>
         </div>
 
@@ -464,6 +470,7 @@ $lockout_seconds = ($lockout_until > time()) ? ($lockout_until - time()) : 0;
                     </ul>
                 </div>
                 <button type="submit" name="register">Sign Up</button>
+                <div class="mobile-toggle">Already have an account? <a href="#" onclick="showForm('login-form'); return false;">Sign In</a></div>
             </form>
         </div>
 

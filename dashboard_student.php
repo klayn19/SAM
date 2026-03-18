@@ -219,8 +219,28 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 .not-recorded{color:var(--muted);font-style:italic;font-size:12px}
 @media(max-width:1024px){.stats-row{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:900px){.info-grid{grid-template-columns:1fr}.info-item:nth-child(odd){border-right:none}.info-item:nth-last-child(-n+2){border-bottom:1px solid var(--border)}.info-item:last-child{border-bottom:none}}
-@media(max-width:768px){.sidebar{width:60px;padding:16px 0}.sidebar-logo span,.sidebar-label,.nav-item span:not(.icon),.sidebar-bottom .student-info{display:none}.sidebar-logo{padding:0 11px 16px;justify-content:center}.sidebar-logo img{width:32px;height:32px}.nav-item{padding:12px;justify-content:center}.sidebar-bottom{padding:12px}.student-chip{justify-content:center}.main-content{margin-left:60px}.profile-card{flex-direction:column;text-align:center}.topbar{padding:0 16px}.topbar-title{font-size:12px}.content{padding:16px}.stats-row{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:480px){.profile-card h2{font-size:16px}.profile-picture-container,.profile-picture-container img{width:64px;height:64px}.data-table th,.data-table td{padding:8px 10px;font-size:12px}.stats-row{grid-template-columns:1fr 1fr;gap:10px}}
+@media(max-width:768px){
+  .sidebar{width:100%;height:65px;min-height:auto;flex-direction:row;justify-content:space-around;padding:0;top:auto;bottom:0;border-right:none;border-top:1px solid var(--border);position:fixed;z-index:999;}
+  .sidebar-logo,.sidebar-label,.sidebar-bottom{display:none;}
+  .nav-item{flex-direction:column;padding:8px 0;gap:4px;flex:1;justify-content:center;border-left:none;border-top:3px solid transparent;font-size:11px;}
+  .nav-item:hover{background:transparent;}
+  .nav-item.active{border-left-color:transparent;border-top-color:var(--accent);background:rgba(0,178,255,.07);}
+  .nav-item .icon{margin:0;}
+  .main-content{margin-left:0;margin-bottom:65px;}
+  .topbar{padding:0 16px;height:56px;}
+  .topbar-title{font-size:13px;}
+  .content{padding:16px;}
+  .profile-card{flex-direction:column;text-align:center;gap:16px;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:480px){
+  .topbar-title{display:none;}
+  .profile-card h2{font-size:18px;}
+  .profile-picture-container,.profile-picture-container img{width:70px;height:70px;}
+  .data-table th,.data-table td{padding:8px;font-size:12px;}
+  .stats-row{gap:10px;}
+  .stat-value{font-size:22px;}
+}
 </style>
 </head>
 <body>
