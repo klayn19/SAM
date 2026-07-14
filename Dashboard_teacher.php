@@ -36,11 +36,12 @@ $conn->query("
         student_id  INT          NOT NULL,
         subject_id  INT          NOT NULL,
         period      ENUM('Prelim','Midterm','Pre-Final','Final') NOT NULL,
+        school_year VARCHAR(20) NOT NULL,
         grade       DECIMAL(5,2) NOT NULL,
         remarks     VARCHAR(50)  DEFAULT NULL,
         encoded_by  INT          NOT NULL,
         encoded_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        UNIQUE KEY unique_grade (student_id, subject_id, period)
+        UNIQUE KEY unique_grade (student_id, subject_id, period, school_year)
     )
 ");
 
@@ -54,10 +55,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $studentId = (int)($_POST['student_id'] ?? 0);
         $subjectId = (int)($_POST['subject_id'] ?? 0);
         $period    = $_POST['period'] ?? '';
+        $schoolYear= trim($_POST['school_year'] ?? '');
         $grade     = (float)($_POST['grade'] ?? 0);
         $validPeriods = ['Prelim', 'Midterm', 'Pre-Final', 'Final'];
 
-        if ($studentId && $subjectId && in_array($period, $validPeriods) && $grade >= 0 && $grade <= 100) {
+        if ($studentId && $subjectId && in_array($period, $validPeriods) && !empty($schoolYear) && $grade >= 0 && $grade <= 100) {
             $chk = $conn->prepare("SELECT id FROM subjects WHERE id = ? AND teacher_id = ?");
             $chk->bind_param('ii', $subjectId, $teacherId);
             $chk->execute();
@@ -65,11 +67,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             if ($chk->num_rows > 0) {
                 $remarks = $grade >= 75 ? 'Passed' : 'Failed';
                 $stmt = $conn->prepare("
-                    INSERT INTO grades (student_id, subject_id, period, grade, remarks, encoded_by)
-                    VALUES (?, ?, ?, ?, ?, ?)
+                    INSERT INTO grades (student_id, subject_id, period, school_year, grade, remarks, encoded_by)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
                     ON DUPLICATE KEY UPDATE grade = VALUES(grade), remarks = VALUES(remarks), encoded_by = VALUES(encoded_by), encoded_at = NOW()
                 ");
-                $stmt->bind_param('iisdsi', $studentId, $subjectId, $period, $grade, $remarks, $teacherId);
+                $stmt->bind_param('iissssi', $studentId, $subjectId, $period, $schoolYear, $grade, $remarks, $teacherId);
                 $stmt->execute();
                 $stmt->close();
                 $successMsg = "Grade saved successfully.";
@@ -125,7 +127,7 @@ $ledger = [];
 if (!empty($subjects)) {
     $subIds = implode(',', array_column($subjects, 'id'));
     $lRes = $conn->query("
-        SELECT g.id as grade_id, g.student_id, g.subject_id, g.period, g.grade, g.remarks, g.encoded_at,
+        SELECT g.id as grade_id, g.student_id, g.subject_id, g.period, g.school_year, g.grade, g.remarks, g.encoded_at,
                u.firstName, u.middleName, u.lastName,
                s.code as subject_code, s.name as subject_name
         FROM grades g
@@ -403,6 +405,22 @@ body { font-family: var(--font-body); background: var(--bg); color: var(--text);
                             </select>
                         </div>
                         <div class="form-group">
+                            <label>School Year</label>
+                            <select name="school_year" class="form-control" required>
+                                <?php 
+                                $currentYear = date('Y');
+                                $years = [
+                                    ($currentYear-1) . '-' . $currentYear,
+                                    $currentYear . '-' . ($currentYear+1),
+                                    ($currentYear+1) . '-' . ($currentYear+2)
+                                ];
+                                foreach ($years as $yr) {
+                                    echo "<option value=\"$yr\">$yr</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label>Grade (0 – 100)</label>
                             <input type="number" name="grade" class="form-control" min="0" max="100" step="0.01" placeholder="e.g. 87.50" required>
                         </div>
@@ -422,13 +440,14 @@ body { font-family: var(--font-body); background: var(--bg); color: var(--text);
         <div class="card">
             <div class="table-wrap">
                 <table class="data-table">
-                    <thead><tr><th>Student</th><th>Subject</th><th>Period</th><th>Grade</th><th>Remarks</th><th>Encoded At</th><th></th></tr></thead>
+                    <thead><tr><th>Student</th><th>Subject</th><th>Period</th><th>School Year</th><th>Grade</th><th>Remarks</th><th>Encoded At</th><th></th></tr></thead>
                     <tbody>
                         <?php foreach (array_slice(array_reverse($ledger),0,10) as $row): ?>
                         <tr>
                             <td><?= htmlspecialchars(trim($row['firstName'].' '.$row['middleName'].' '.$row['lastName'])) ?></td>
                             <td><span class="subject-code"><?= htmlspecialchars($row['subject_code']) ?></span><?= htmlspecialchars($row['subject_name']) ?></td>
                             <td><span class="period-badge"><?= htmlspecialchars($row['period']) ?></span></td>
+                            <td><?= htmlspecialchars($row['school_year']) ?></td>
                             <td><strong><?= number_format($row['grade'],2) ?></strong></td>
                             <td><span class="grade-pill <?= $row['remarks']==='Passed'?'grade-pass':'grade-fail' ?>"><?= htmlspecialchars($row['remarks']) ?></span></td>
                             <td style="color:var(--muted);font-size:12px;"><?= date('M d, Y h:i A', strtotime($row['encoded_at'])) ?></td>
@@ -454,32 +473,39 @@ body { font-family: var(--font-body); background: var(--bg); color: var(--text);
             <p>Complete list of all grades you have encoded.</p>
         </div>
         <div class="card">
-            <div class="card-head">
-                <h2>All Encoded Grades</h2>
-                <?php if (!empty($ledger)): ?><span style="font-size:12px;color:var(--muted);"><?= count($ledger) ?> records</span><?php endif; ?>
+            <form action="print_grades.php" method="POST" target="_blank">
+            <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                <div>
+                    <h2>All Encoded Grades</h2>
+                    <?php if (!empty($ledger)): ?><span style="font-size:12px;color:var(--muted);"><?= count($ledger) ?> records</span><?php endif; ?>
+                </div>
+                <?php if (!empty($ledger)): ?>
+                <button type="submit" class="btn" style="background:#f0f2f8;color:#1a1d2e;border:1px solid #d1d5e0;">🖨️ Print Selected</button>
+                <?php endif; ?>
             </div>
             <div class="table-wrap">
                 <table class="data-table">
-                    <thead><tr><th>#</th><th>Student Name</th><th>Subject</th><th>Period</th><th>Grade</th><th>Remarks</th><th>Encoded At</th><th>Action</th></tr></thead>
+                    <thead><tr>
+                        <th style="width: 40px;"><input type="checkbox" id="selectAllGrades" onclick="document.querySelectorAll('.grade-chk').forEach(c=>c.checked=this.checked)"></th>
+                        <th>#</th><th>Student Name</th><th>Subject</th><th>Period</th><th>School Year</th><th>Grade</th><th>Remarks</th><th>Encoded At</th><th>Action</th>
+                    </tr></thead>
                     <tbody>
                         <?php if (empty($ledger)): ?>
-                            <tr class="empty-row"><td colspan="8">No grades encoded yet.</td></tr>
+                            <tr class="empty-row"><td colspan="10">No grades encoded yet.</td></tr>
                         <?php else: ?>
                             <?php foreach ($ledger as $i => $row): ?>
                             <tr>
+                                <td><input type="checkbox" name="grade_ids[]" value="<?= $row['grade_id'] ?>" class="grade-chk"></td>
                                 <td style="color:var(--muted);"><?= $i+1 ?></td>
                                 <td><?= htmlspecialchars(trim($row['firstName'].' '.$row['middleName'].' '.$row['lastName'])) ?></td>
                                 <td><span class="subject-code"><?= htmlspecialchars($row['subject_code']) ?></span><?= htmlspecialchars($row['subject_name']) ?></td>
                                 <td><span class="period-badge"><?= htmlspecialchars($row['period']) ?></span></td>
+                                <td><?= htmlspecialchars($row['school_year']) ?></td>
                                 <td><strong><?= number_format($row['grade'],2) ?></strong></td>
                                 <td><span class="grade-pill <?= $row['remarks']==='Passed'?'grade-pass':'grade-fail' ?>"><?= htmlspecialchars($row['remarks']) ?></span></td>
                                 <td style="color:var(--muted);font-size:12px;"><?= date('M d, Y h:i A', strtotime($row['encoded_at'])) ?></td>
                                 <td>
-                                    <form method="POST" onsubmit="return confirm('Delete this grade entry?')">
-                                        <input type="hidden" name="action"   value="delete_grade">
-                                        <input type="hidden" name="grade_id" value="<?= $row['grade_id'] ?>">
-                                        <button type="submit" class="btn btn-sm btn-danger">🗑 Delete</button>
-                                    </form>
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="if(confirm('Delete this grade entry?')){ document.getElementById('delete-form-<?= $row['grade_id'] ?>').submit(); }">🗑 Delete</button>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
@@ -487,7 +513,17 @@ body { font-family: var(--font-body); background: var(--bg); color: var(--text);
                     </tbody>
                 </table>
             </div>
+            </form>
         </div>
+
+        <?php if (!empty($ledger)): ?>
+            <?php foreach ($ledger as $row): ?>
+                <form id="delete-form-<?= $row['grade_id'] ?>" method="POST" style="display:none;">
+                    <input type="hidden" name="action" value="delete_grade">
+                    <input type="hidden" name="grade_id" value="<?= $row['grade_id'] ?>">
+                </form>
+            <?php endforeach; ?>
+        <?php endif; ?>
 
         <!-- ══ SUBJECTS ══ -->
         <?php elseif ($view === 'subjects'): ?>

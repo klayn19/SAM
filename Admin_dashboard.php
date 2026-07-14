@@ -13,6 +13,38 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in'] || ($_SESSION['rol
 
 require_once 'backend/config.php';
 
+$successMsg = '';
+$errorMsg = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'register_teacher') {
+    $firstName     = trim($_POST['firstName'] ?? '');
+    $middleName    = trim($_POST['middleName'] ?? '');
+    $lastName      = trim($_POST['lastName'] ?? '');
+    $email         = trim($_POST['email'] ?? '');
+    $contactNumber = trim($_POST['contactNumber'] ?? '');
+    $password      = $_POST['password'] ?? '';
+    
+    $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+    
+    $stmt = $conn->prepare("SELECT 1 FROM users WHERE LOWER(email) = LOWER(?) LIMIT 1");
+    $stmt->bind_param('s', $email);
+    $stmt->execute();
+    $stmt->store_result();
+    if ($stmt->num_rows > 0) {
+        $errorMsg = "Email already exists.";
+    } else {
+        $insert = $conn->prepare("INSERT INTO users (firstName, middleName, lastName, email, contactNumber, Password, userType) VALUES (?, ?, ?, ?, ?, ?, 'teacher')");
+        $insert->bind_param('ssssss', $firstName, $middleName, $lastName, $email, $contactNumber, $passwordHash);
+        if ($insert->execute()) {
+            $successMsg = "Teacher registered successfully.";
+        } else {
+            $errorMsg = "Registration failed.";
+        }
+        $insert->close();
+    }
+    $stmt->close();
+}
+
 $view              = $_GET['view']       ?? 'home';
 $selectedStudentId = $_GET['student_id'] ?? null;
 $adminName         = $_SESSION['firstName'] ?? 'Admin';
@@ -81,6 +113,7 @@ $totalRecords = count($attendanceData);
     <a href="?view=record"  class="nav-item <?= ($view==='record' && !$selectedStudentId)?'active':'' ?>"><span class="icon">📅</span> Record</a>
     <a href="rfid_manage.php"       class="nav-item"><span class="icon">💳</span> RFID Management</a>
     <a href="Attendance_manual.php" class="nav-item"><span class="icon">📝</span> Attendance Manual</a>
+    <a href="?view=register_teacher" class="nav-item <?= $view==='register_teacher'?'active':'' ?>"><span class="icon">👨‍🏫</span> Register Teacher</a>
     <div class="sidebar-bottom">
         <div class="admin-chip">
             <div class="avatar"><?= strtoupper(substr($adminName,0,1)) ?></div>
@@ -327,6 +360,54 @@ $totalRecords = count($attendanceData);
                     <?php endforeach; endif; ?>
                 </tbody>
             </table>
+        </div>
+     </div>
+
+    <!-- ══ REGISTER TEACHER ══ -->
+    <?php elseif ($view === 'register_teacher'): ?>
+    <div class="page-header">
+        <h1>Register Teacher</h1>
+        <p>Create a new teacher account for the system.</p>
+    </div>
+    
+    <?php if (!empty($successMsg)): ?><div class="alert alert-success" style="padding:12px;background:rgba(54,214,138,.1);color:#36d68a;border:1px solid #36d68a;border-radius:8px;margin-bottom:20px;">✅ <?= htmlspecialchars($successMsg) ?></div><?php endif; ?>
+    <?php if (!empty($errorMsg)): ?><div class="alert alert-error" style="padding:12px;background:rgba(255,77,109,.1);color:#ff4d6d;border:1px solid #ff4d6d;border-radius:8px;margin-bottom:20px;">⚠️ <?= htmlspecialchars($errorMsg) ?></div><?php endif; ?>
+
+    <div class="card" style="max-width: 600px; margin: 0 auto;">
+        <div class="card-head">
+            <h2>👨‍🏫 Teacher Information</h2>
+        </div>
+        <div class="card-body" style="padding: 24px;">
+            <form method="POST">
+                <input type="hidden" name="action" value="register_teacher">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+                    <div>
+                        <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;">First Name</label>
+                        <input type="text" name="firstName" required style="width:100%;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;">
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;">Last Name</label>
+                        <input type="text" name="lastName" required style="width:100%;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;">
+                    </div>
+                </div>
+                <div style="margin-bottom:16px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;">Middle Name (Optional)</label>
+                    <input type="text" name="middleName" style="width:100%;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;">
+                </div>
+                <div style="margin-bottom:16px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;">Email Address</label>
+                    <input type="email" name="email" required style="width:100%;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;">
+                </div>
+                <div style="margin-bottom:16px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;">Contact Number</label>
+                    <input type="text" name="contactNumber" required style="width:100%;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;">
+                </div>
+                <div style="margin-bottom:24px;">
+                    <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;">Password</label>
+                    <input type="password" name="password" required style="width:100%;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;">
+                </div>
+                <button type="submit" style="width:100%;padding:12px;background:linear-gradient(135deg,#00b2ff,#7b5cff);color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-family:inherit;">Register Teacher</button>
+            </form>
         </div>
     </div>
 

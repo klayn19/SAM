@@ -103,14 +103,14 @@ if ($studentInfo && !empty($studentInfo['email'])) {
 $gradesData = [];
 if ($studentId) {
     $res = $conn->prepare("
-        SELECT g.period, g.grade, g.remarks, g.encoded_at,
+        SELECT g.period, g.school_year, g.grade, g.remarks, g.encoded_at,
                s.code AS subject_code, s.name AS subject_name,
                u.firstName AS teacher_first, u.lastName AS teacher_last
         FROM grades g
         JOIN subjects s ON g.subject_id = s.id
         JOIN users u ON s.teacher_id = u.ID
         WHERE g.student_id = ?
-        ORDER BY s.code, FIELD(g.period,'Prelim','Midterm','Pre-Final','Final')
+        ORDER BY s.code, FIELD(g.period,'Prelim','Midterm','Pre-Final','Final'), g.school_year
     ");
     $res->bind_param("i", $studentId);
     $res->execute();
@@ -415,12 +415,13 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
             </div>
             <div class="table-wrap">
                 <table class="data-table">
-                    <thead><tr><th>Period</th><th>Grade</th><th>Remarks</th><th>Date Encoded</th></tr></thead>
+                    <thead><tr><th>Period</th><th>School Year</th><th>Grade</th><th>Remarks</th><th>Date Encoded</th></tr></thead>
                     <tbody>
                         <?php foreach ($periods as $period): ?>
                         <?php if (isset($periodRows[$period])): $r = $periodRows[$period]; ?>
                         <tr>
                             <td><span class="period-badge"><?= $period ?></span></td>
+                            <td><?= htmlspecialchars($r['school_year']) ?></td>
                             <td><strong style="font-size:15px;"><?= number_format($r['grade'],2) ?></strong></td>
                             <td><span class="grade-pill <?= $r['remarks']==='Passed'?'grade-pass':'grade-fail' ?>"><?= htmlspecialchars($r['remarks']) ?></span></td>
                             <td style="color:var(--muted);font-size:12px;"><?= date('M d, Y', strtotime($r['encoded_at'])) ?></td>
@@ -428,7 +429,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
                         <?php else: ?>
                         <tr>
                             <td><span class="period-badge"><?= $period ?></span></td>
-                            <td colspan="3" class="not-recorded">Not yet encoded</td>
+                            <td colspan="4" class="not-recorded">Not yet encoded</td>
                         </tr>
                         <?php endif; ?>
                         <?php endforeach; ?>

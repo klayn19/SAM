@@ -152,6 +152,7 @@ if (isset($_POST['login'])) {
     $password = $_POST['password'] ?? '';
 
     // --- Check lockout FIRST ---
+   
     $secondsRemaining = getLockoutSecondsRemaining($conn, $email);
     if ($secondsRemaining > 0) {
         $minutes = ceil($secondsRemaining / 60);
@@ -162,6 +163,7 @@ if (isset($_POST['login'])) {
         header("Location: ../index.php");
         exit();
     }
+    
 
     // --- Verify credentials ---
     $sql = "SELECT ID, firstName, email, Password, userType FROM users WHERE LOWER(email) = LOWER(?) LIMIT 1";
@@ -198,6 +200,7 @@ if (isset($_POST['login'])) {
     }
 
     // FAILED login — record the attempt
+  
     recordFailedAttempt($conn, $email);
 
     $secondsRemaining = getLockoutSecondsRemaining($conn, $email);
